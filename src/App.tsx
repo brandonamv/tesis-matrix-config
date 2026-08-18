@@ -20,9 +20,43 @@ function App() {
   const [class1InitialPlayers, setClass1InitialPlayers] = useState<number>(1);
   const [class2InitialPlayers, setClass2InitialPlayers] = useState<number>(10);
 
-  const [text, setText] = useState("Hello, this is the text inside my file!");
+  const isValidFormula = (formula: string) => {
+    if (!formula) return false;
+    if (!/^[vc0-9+\-*/()^.\s]+$/i.test(formula)) return false;
 
-  const isValidFormula = (formula: string) => /^[vc0-9+\-*/().\s]+$/i.test(formula || '');
+    const tokens = formula.match(/([vc])|([0-9.]+)|([+\-*/^])|([()])|([^\s])/gi);
+    if (!tokens) return false;
+
+    let balance = 0;
+    let lastToken = 'START';
+
+    for (const token of tokens) {
+      const t = token.toLowerCase();
+
+      if (['v', 'c'].includes(t) || /^[0-9.]+$/.test(t)) {
+
+        if (lastToken === 'VALUE' || lastToken === 'CLOSE') return false;
+
+        if ((t.match(/\./g) || []).length > 1) return false;
+        lastToken = 'VALUE';
+      } else if (['+', '-', '*', '/', '^'].includes(t)) {
+        if (lastToken === 'START' || lastToken === 'OPEN' || lastToken === 'OP') return false;
+        lastToken = 'OP';
+      } else if (t === '(') {
+        if (lastToken === 'VALUE' || lastToken === 'CLOSE') return false;
+        balance++;
+        lastToken = 'OPEN';
+      } else if (t === ')') {
+        if (lastToken === 'START' || lastToken === 'OPEN' || lastToken === 'OP') return false;
+        balance--;
+        if (balance < 0) return false;
+        lastToken = 'CLOSE';
+      } else {
+        return false;
+      }
+    }
+    return balance === 0 && (lastToken === 'VALUE' || lastToken === 'CLOSE');
+  };
 
   const isResourceGainValid = resourceGain > 0;
   const isResourceCostValid = resourceCost > 0;
@@ -41,8 +75,19 @@ function App() {
   const isClass2Formula1Valid = isValidFormula(class2Formula[1]);
 
   const handleDownload = () => {
+    const fileContent = `v=${resourceGain}
+c=${resourceCost}
+m=${timePenalty}
+i=${initialFitness}
+r=${initialResources}
+u=${maxFitness}
+s=${simulationSpeed}
+p=${maxInteractions}
+0=${class1Formula[0]};${class1Formula[1]};${class1InitialPlayers};${class1Name}
+1=${class2Formula[0]};${class2Formula[1]};${class2InitialPlayers};${class2Name}`;
+
     // 1. Create a blob with the text data and set MIME type to plain text
-    const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+    const blob = new Blob([fileContent], { type: 'text/plain;charset=utf-8' });
 
     // 2. Generate a temporary object URL pointing to the blob
     const url = URL.createObjectURL(blob);
