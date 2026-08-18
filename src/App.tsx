@@ -86,18 +86,13 @@ p=${maxInteractions}
 0=${class1Formula[0]};${class1Formula[1]};${class1InitialPlayers};${class1Name}
 1=${class2Formula[0]};${class2Formula[1]};${class2InitialPlayers};${class2Name}`;
 
-    // 1. Create a blob with the text data and set MIME type to plain text
     const blob = new Blob([fileContent], { type: 'text/plain;charset=utf-8' });
 
-    // 2. Generate a temporary object URL pointing to the blob
     const url = URL.createObjectURL(blob);
 
-    // 3. Create a temporary hidden anchor element
     const link = document.createElement('a');
     link.href = url;
-    link.download = 'matrix.txt'; // The default filename
-
-    // 4. Append to DOM, click it to trigger download, and clean up
+    link.download = 'matrix.txt';
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
