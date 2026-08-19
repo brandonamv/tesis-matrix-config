@@ -422,14 +422,16 @@ f=${resourceIncrementFormula}
           )}
         </Grid>
         <Grid size={12}>
-          <Button
-            variant="contained"
-            fullWidth
-            onClick={handleDownload}
-            disabled={!isFormValid}
-          >
-            Generar Matriz
-          </Button>
+          <Tooltip title="Genera la matriz de configuración (guardar en la carpeta 'Saved' del juego)" placement="top">
+            <Button
+              variant="contained"
+              fullWidth
+              onClick={handleDownload}
+              disabled={!isFormValid}
+            >
+              Generar Matriz
+            </Button>
+          </Tooltip>
         </Grid>
       </Grid>
     </Container>
