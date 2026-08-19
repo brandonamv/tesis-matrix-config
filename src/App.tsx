@@ -1,7 +1,15 @@
 import { useState } from 'react'
 import './App.css'
 
-import { Button, Container, Grid, TextField, Tooltip } from '@mui/material';
+import { Button, Container, FormControl, Grid, InputLabel, MenuItem, Select, TextField, Tooltip } from '@mui/material';
+
+const validCaracthers = "0123456789+-*/()^. ";
+
+enum ResourceIncrementType {
+  NONE = 0,
+  STATIC = 1,
+  DYNAMIC = 2
+}
 
 function App() {
   const [resourceGain, setResourceGain] = useState<number>(1.0);
@@ -13,6 +21,9 @@ function App() {
   const [simulationSpeed, setSimulationSpeed] = useState<number>(1.5);
   const [maxInteractions, setMaxInteractions] = useState<number>(100);
 
+  const [resourceIncrementType, setResourceIncrementType] = useState<ResourceIncrementType>(ResourceIncrementType.NONE);
+  const [resourceIncrementFormula, setResourceIncrementFormula] = useState<string>("0");
+
   const [class1Name, setClass1Name] = useState<string>("Agresivo");
   const [class2Name, setClass2Name] = useState<string>("Pasivo");
   const [class1Formula, setClass1Formula] = useState<Array<string>>(["0.5*(v-c)", "v"]);
@@ -20,42 +31,50 @@ function App() {
   const [class1InitialPlayers, setClass1InitialPlayers] = useState<number>(1);
   const [class2InitialPlayers, setClass2InitialPlayers] = useState<number>(10);
 
-  const isValidFormula = (formula: string) => {
+  const isValidFormula = (formula: string, variables: string) => {
     if (!formula) return false;
-    if (!/^[vc0-9+\-*/()^.\s]+$/i.test(formula)) return false;
-
-    const tokens = formula.match(/([vc])|([0-9.]+)|([+\-*/^])|([()])|([^\s])/gi);
-    if (!tokens) return false;
-
     let balance = 0;
-    let lastToken = 'START';
+    for (const char of formula) {
+      if (!validCaracthers.includes(char) && !variables.includes(char)) return false;
+      if (char === '(') balance++;
+      if (char === ')') balance--;
+      if (balance < 0) return false;
+    }
 
-    for (const token of tokens) {
-      const t = token.toLowerCase();
+    if (balance !== 0) return false;
 
-      if (['v', 'c'].includes(t) || /^[0-9.]+$/.test(t)) {
+    const cleanFormula = formula.replace(/\s+/g, '');
+    if (cleanFormula.length === 0) return false;
 
-        if (lastToken === 'VALUE' || lastToken === 'CLOSE') return false;
+    const isOperator = (c: string) => "+-*/^".includes(c);
+    const isVariable = (c: string) => variables.includes(c);
+    const isNumberPart = (c: string) => "0123456789.".includes(c);
+    const isOperand = (c: string) => isVariable(c) || isNumberPart(c);
 
-        if ((t.match(/\./g) || []).length > 1) return false;
-        lastToken = 'VALUE';
-      } else if (['+', '-', '*', '/', '^'].includes(t)) {
-        if (lastToken === 'START' || lastToken === 'OPEN' || lastToken === 'OP') return false;
-        lastToken = 'OP';
-      } else if (t === '(') {
-        if (lastToken === 'VALUE' || lastToken === 'CLOSE') return false;
-        balance++;
-        lastToken = 'OPEN';
-      } else if (t === ')') {
-        if (lastToken === 'START' || lastToken === 'OPEN' || lastToken === 'OP') return false;
-        balance--;
-        if (balance < 0) return false;
-        lastToken = 'CLOSE';
-      } else {
-        return false;
+    for (let i = 0; i < cleanFormula.length - 1; i++) {
+      const current = cleanFormula[i];
+      const next = cleanFormula[i + 1];
+
+      if (isOperator(current)) {
+        if (!isOperand(next) && next !== '(') return false;
+      } else if (isVariable(current)) {
+        if (!isOperator(next) && next !== ')') return false;
+      } else if (isNumberPart(current)) {
+        if (!isNumberPart(next) && !isOperator(next) && next !== ')') return false;
+      } else if (current === '(') {
+        if (!isOperand(next) && next !== '(' && next !== '-') return false;
+      } else if (current === ')') {
+        if (!isOperator(next) && next !== ')') return false;
       }
     }
-    return balance === 0 && (lastToken === 'VALUE' || lastToken === 'CLOSE');
+
+    const firstChar = cleanFormula[0];
+    const lastChar = cleanFormula[cleanFormula.length - 1];
+
+    if (isOperator(firstChar) && firstChar !== '-') return false;
+    if (isOperator(lastChar) || lastChar === '(') return false;
+
+    return true;
   };
 
   const isResourceGainValid = resourceGain > 0;
@@ -69,10 +88,12 @@ function App() {
   const isSimulationSpeedValid = simulationSpeed > 0;
   const isMaxInteractionsValid = maxInteractions > 0;
 
-  const isClass1Formula0Valid = isValidFormula(class1Formula[0]);
-  const isClass1Formula1Valid = isValidFormula(class1Formula[1]);
-  const isClass2Formula0Valid = isValidFormula(class2Formula[0]);
-  const isClass2Formula1Valid = isValidFormula(class2Formula[1]);
+  const isClass1Formula0Valid = isValidFormula(class1Formula[0], "vc");
+  const isClass1Formula1Valid = isValidFormula(class1Formula[1], "vc");
+  const isClass2Formula0Valid = isValidFormula(class2Formula[0], "vc");
+  const isClass2Formula1Valid = isValidFormula(class2Formula[1], "vc");
+
+  const isResourceIncrementFormulaValid = resourceIncrementType === ResourceIncrementType.DYNAMIC ? isValidFormula(resourceIncrementFormula, "tp") : !isNaN(Number(resourceIncrementFormula));
 
   const handleDownload = () => {
     const fileContent = `v=${resourceGain}
@@ -83,6 +104,8 @@ r=${initialResources}
 u=${maxFitness}
 s=${simulationSpeed}
 p=${maxInteractions}
+t=${resourceIncrementType}
+f=${resourceIncrementFormula}
 0=${class1Formula[0]};${class1Formula[1]};${class1InitialPlayers};${class1Name}
 1=${class2Formula[0]};${class2Formula[1]};${class2InitialPlayers};${class2Name}`;
 
@@ -102,7 +125,8 @@ p=${maxInteractions}
   const isFormValid = isResourceGainValid && isResourceCostValid && isInitialFitnessValid &&
     isMaxFitnessValid && isInitialResourcesValid && isTimePenaltyValid && isClass1InitialPlayersValid &&
     isClass2InitialPlayersValid && isSimulationSpeedValid && isMaxInteractionsValid &&
-    isClass1Formula0Valid && isClass1Formula1Valid && isClass2Formula0Valid && isClass2Formula1Valid;
+    isClass1Formula0Valid && isClass1Formula1Valid && isClass2Formula0Valid && isClass2Formula1Valid &&
+    isResourceIncrementFormulaValid;
 
   return (
     <Container maxWidth={"md"} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding: 2 }}>
@@ -172,43 +196,6 @@ p=${maxInteractions}
               onChange={(e) => setMaxFitness(Number(e.target.value))}
               error={!isMaxFitnessValid}
               helperText={!isMaxFitnessValid ? "Debe ser mayor al Fitness Inicial" : ""}
-              slotProps={{
-                htmlInput: {
-                  step: 'any',
-                  min: 0
-                }
-              }}
-              variant="outlined"
-              fullWidth
-            />
-          </Tooltip>
-        </Grid>
-        <Grid size={{ xs: 12, sm: 6 }}>
-          <TextField
-            label="Recursos Iniciales"
-            type="number"
-            value={initialResources}
-            onChange={(e) => setInitialResources(Number(e.target.value))}
-            error={!isInitialResourcesValid}
-            helperText={!isInitialResourcesValid ? "Debe ser > 0" : ""}
-            slotProps={{
-              htmlInput: {
-                min: 0
-              }
-            }}
-            variant="outlined"
-            fullWidth
-          />
-        </Grid>
-        <Grid size={{ xs: 12, sm: 6 }}>
-          <Tooltip title="Descuento de fitness a los jugadores por cada interaccion realizada en la simulación">
-            <TextField
-              label="Penalización por Tiempo"
-              type="number"
-              value={timePenalty}
-              onChange={(e) => setTimePenalty(Number(e.target.value))}
-              error={!isTimePenaltyValid}
-              helperText={!isTimePenaltyValid ? "Debe ser >= 0" : ""}
               slotProps={{
                 htmlInput: {
                   step: 'any',
@@ -322,7 +309,7 @@ p=${maxInteractions}
             fullWidth
           />
         </Grid>
-        <Grid size={{ xs: 12, sm: 6 }}>
+        <Grid size={{ xs: 12, sm: 4 }}>
           <TextField
             label="Velocidad de Simulación"
             type="number"
@@ -340,9 +327,9 @@ p=${maxInteractions}
             fullWidth
           />
         </Grid>
-        <Grid size={{ xs: 12, sm: 6 }}>
+        <Grid size={{ xs: 12, sm: 4 }}>
           <TextField
-            label="Máximo de Interacciones"
+            label="Máximo de Interacciones (T)"
             type="number"
             value={maxInteractions}
             onChange={(e) => setMaxInteractions(Number(e.target.value))}
@@ -357,6 +344,82 @@ p=${maxInteractions}
             variant="outlined"
             fullWidth
           />
+        </Grid>
+        <Grid size={{ xs: 12, sm: 4 }}>
+          <Tooltip title="Descuento de fitness a los jugadores por cada interaccion realizada en la simulación">
+            <TextField
+              label="Penalización por Tiempo"
+              type="number"
+              value={timePenalty}
+              onChange={(e) => setTimePenalty(Number(e.target.value))}
+              error={!isTimePenaltyValid}
+              helperText={!isTimePenaltyValid ? "Debe ser >= 0" : ""}
+              slotProps={{
+                htmlInput: {
+                  step: 'any',
+                  min: 0
+                }
+              }}
+              variant="outlined"
+              fullWidth
+            />
+          </Tooltip>
+        </Grid>
+        <Grid size={{ xs: 12, sm: resourceIncrementType === ResourceIncrementType.NONE ? 6 : 4 }}>
+          <TextField
+            label="Recursos Iniciales"
+            type="number"
+            value={initialResources}
+            onChange={(e) => setInitialResources(Number(e.target.value))}
+            error={!isInitialResourcesValid}
+            helperText={!isInitialResourcesValid ? "Debe ser > 0" : ""}
+            slotProps={{
+              htmlInput: {
+                min: 0
+              }
+            }}
+            variant="outlined"
+            fullWidth
+          />
+        </Grid>
+        <Grid size={{ xs: 12, sm: resourceIncrementType === ResourceIncrementType.NONE ? 6 : 4 }}>
+          <FormControl fullWidth variant="outlined">
+            <InputLabel id="resource-increment-type-label">Tipo de Incremento</InputLabel>
+            <Select
+              labelId="resource-increment-type-label"
+              id="resource-increment-type"
+              value={resourceIncrementType}
+              onChange={(e) => setResourceIncrementType(Number(e.target.value) as ResourceIncrementType)}
+              label="Tipo de Incremento"
+              fullWidth
+            >
+              <MenuItem value={ResourceIncrementType.NONE}>Ninguno</MenuItem>
+              <MenuItem value={ResourceIncrementType.STATIC}>Estático</MenuItem>
+              <MenuItem value={ResourceIncrementType.DYNAMIC}>Dinámico</MenuItem>
+            </Select>
+          </FormControl>
+        </Grid>
+        <Grid size={{ xs: 12, sm: 4 }}>
+          {resourceIncrementType !== ResourceIncrementType.NONE && (
+            <Tooltip title="Fórmula de crecimiento de recursos. Estático: Número, Dinámico: t = Interacciones/tiempo, p = Población Total" placement="top">
+              <TextField
+                label="Fórmula de Crecimiento"
+                type="text"
+                value={resourceIncrementFormula}
+                onChange={(e) => setResourceIncrementFormula(e.target.value)}
+                error={!isResourceIncrementFormulaValid}
+                helperText={!isResourceIncrementFormulaValid ? "Fórmula inválida" : ""}
+                slotProps={{
+                  htmlInput: {
+                    step: 'any',
+                    min: 0.1
+                  }
+                }}
+                variant="outlined"
+                fullWidth
+              />
+            </Tooltip>
+          )}
         </Grid>
         <Grid size={12}>
           <Button
