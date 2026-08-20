@@ -13,8 +13,8 @@ export const useMatrixForm = () => {
     maxFitness: 2.0,
     simulationSpeed: 1.5,
     maxInteractions: 100,
-    resourceIncrementType: ResourceIncrementType.NONE,
-    resourceIncrementFormula: "0",
+    resourceIncrementType: ResourceIncrementType.DYNAMIC,
+    resourceIncrementFormula: "p/2",
     class1: {
       name: "Agresivo",
       initialPlayers: 1,

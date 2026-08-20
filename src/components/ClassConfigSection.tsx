@@ -1,5 +1,5 @@
 import React from 'react';
-import { Grid, TextField } from '@mui/material';
+import { Grid, TextField, useMediaQuery } from '@mui/material';
 import type { ClassConfig } from '../types';
 
 interface ClassConfigSectionProps {
@@ -14,6 +14,9 @@ interface ClassConfigSectionProps {
 }
 
 export const ClassConfigSection: React.FC<ClassConfigSectionProps> = ({ config, otherClassName, onChange, validations }) => {
+  const isCompact = useMediaQuery('(max-width:1400px)');
+  const inputSize = isCompact ? "small" : "medium";
+
   return (
     <>
       <Grid size={{ xs: 6, sm: 3 }}>
@@ -24,6 +27,7 @@ export const ClassConfigSection: React.FC<ClassConfigSectionProps> = ({ config, 
           onChange={(e) => onChange('name', e.target.value)}
           variant="outlined"
           fullWidth
+          size={inputSize}
         />
       </Grid>
       <Grid size={{ xs: 6, sm: 3 }}>
@@ -37,6 +41,7 @@ export const ClassConfigSection: React.FC<ClassConfigSectionProps> = ({ config, 
           slotProps={{ htmlInput: { min: 1 } }}
           variant="outlined"
           fullWidth
+          size={inputSize}
         />
       </Grid>
       <Grid size={{ xs: 6, sm: 3 }}>
@@ -49,6 +54,7 @@ export const ClassConfigSection: React.FC<ClassConfigSectionProps> = ({ config, 
           helperText={!validations.isFormula0Valid ? "Fórmula inválida" : ""}
           variant="outlined"
           fullWidth
+          size={inputSize}
         />
       </Grid>
       <Grid size={{ xs: 6, sm: 3 }}>

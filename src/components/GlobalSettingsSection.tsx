@@ -1,5 +1,5 @@
 import React from 'react';
-import { Grid, TextField, Tooltip, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
+import { Grid, TextField, Tooltip, FormControl, InputLabel, Select, MenuItem, useMediaQuery } from '@mui/material';
 import { ResourceIncrementType } from '../types';
 import type { MatrixConfig } from '../types';
 
@@ -20,6 +20,9 @@ interface GlobalSettingsSectionProps {
 }
 
 export const GlobalSettingsSection: React.FC<GlobalSettingsSectionProps> = ({ config, onChange, validations }) => {
+  const isCompact = useMediaQuery('(max-width:1400px)');
+  const inputSize = isCompact ? "small" : "medium";
+
   return (
     <>
       <Grid size={{ xs: 12, sm: 6 }}>
@@ -33,6 +36,7 @@ export const GlobalSettingsSection: React.FC<GlobalSettingsSectionProps> = ({ co
           slotProps={{ htmlInput: { step: 'any', min: 0 } }}
           variant="outlined"
           fullWidth
+          size={inputSize}
         />
       </Grid>
       <Grid size={{ xs: 12, sm: 6 }}>
@@ -46,6 +50,7 @@ export const GlobalSettingsSection: React.FC<GlobalSettingsSectionProps> = ({ co
           slotProps={{ htmlInput: { step: 'any', min: 0 } }}
           variant="outlined"
           fullWidth
+          size={inputSize}
         />
       </Grid>
       <Grid size={{ xs: 12, sm: 6 }}>
@@ -60,6 +65,7 @@ export const GlobalSettingsSection: React.FC<GlobalSettingsSectionProps> = ({ co
             slotProps={{ htmlInput: { step: 'any', min: 0 } }}
             variant="outlined"
             fullWidth
+            size={inputSize}
           />
         </Tooltip>
       </Grid>
@@ -75,6 +81,7 @@ export const GlobalSettingsSection: React.FC<GlobalSettingsSectionProps> = ({ co
             slotProps={{ htmlInput: { step: 'any', min: 0 } }}
             variant="outlined"
             fullWidth
+            size={inputSize}
           />
         </Tooltip>
       </Grid>
@@ -89,6 +96,7 @@ export const GlobalSettingsSection: React.FC<GlobalSettingsSectionProps> = ({ co
           slotProps={{ htmlInput: { step: 'any', min: 0.1 } }}
           variant="outlined"
           fullWidth
+          size={inputSize}
         />
       </Grid>
       <Grid size={{ xs: 12, sm: 4 }}>
@@ -102,6 +110,7 @@ export const GlobalSettingsSection: React.FC<GlobalSettingsSectionProps> = ({ co
           slotProps={{ htmlInput: { step: 'any', min: 0 } }}
           variant="outlined"
           fullWidth
+          size={inputSize}
         />
       </Grid>
       <Grid size={{ xs: 12, sm: 4 }}>
@@ -116,6 +125,7 @@ export const GlobalSettingsSection: React.FC<GlobalSettingsSectionProps> = ({ co
             slotProps={{ htmlInput: { step: 'any', min: 0 } }}
             variant="outlined"
             fullWidth
+            size={inputSize}
           />
         </Tooltip>
       </Grid>
@@ -130,10 +140,11 @@ export const GlobalSettingsSection: React.FC<GlobalSettingsSectionProps> = ({ co
           slotProps={{ htmlInput: { min: 0 } }}
           variant="outlined"
           fullWidth
+          size={inputSize}
         />
       </Grid>
       <Grid size={{ xs: 12, sm: config.resourceIncrementType === ResourceIncrementType.NONE ? 6 : 4 }}>
-        <FormControl fullWidth variant="outlined">
+        <FormControl fullWidth variant="outlined" size={inputSize}>
           <InputLabel id="resource-increment-type-label">Tipo de Incremento</InputLabel>
           <Select
             labelId="resource-increment-type-label"
@@ -162,6 +173,7 @@ export const GlobalSettingsSection: React.FC<GlobalSettingsSectionProps> = ({ co
               slotProps={{ htmlInput: { step: 'any', min: 0.1 } }}
               variant="outlined"
               fullWidth
+              size={inputSize}
             />
           </Tooltip>
         )}
