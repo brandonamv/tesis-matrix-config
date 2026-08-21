@@ -80,7 +80,7 @@ const theme = createTheme({
     MuiMenu: {
       styleOverrides: {
         paper: {
-          backgroundColor: 'rgba(0, 27, 57, 1)',
+          backgroundColor: 'rgba(0, 61, 38, 1)',
         },
       },
     },
@@ -89,12 +89,13 @@ const theme = createTheme({
         root: {
           color: 'rgba(255, 255, 255, 1)',
           '&:hover': {
-            backgroundColor: 'rgba(0, 61, 38, 0.8)',
+            backgroundColor: 'rgba(8, 133, 85, 1)',
           },
           '&.Mui-selected': {
-            backgroundColor: 'rgba(0, 61, 38, 0.9)',
+            color: 'rgba(0, 27, 57, 1)',
+            backgroundColor: 'rgba(251, 244, 151, 1)',
             '&:hover': {
-              backgroundColor: 'rgba(0, 61, 38, 0.8)',
+              backgroundColor: 'rgba(255, 238, 0, 1)',
             },
           },
         },

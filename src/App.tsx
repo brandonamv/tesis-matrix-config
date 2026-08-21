@@ -11,11 +11,11 @@ function App() {
 
   return (
     <Container maxWidth={"md"} disableGutters>
-      <Box sx={{ width: '100%', textAlign: 'center', color: 'rgba(0, 27, 57, 1)', marginBottom: 2 }}>
-        <Typography variant="h2" sx={{ fontWeight: 'bold' }}>
+      <Box sx={{ width: '100%', textAlign: 'center', color: 'rgba(0, 27, 57, 1)', marginY: 2 }}>
+        <Typography variant="h2" sx={{ fontWeight: 'bold', marginBottom: 2 }}>
           TACTIC INVASORS
         </Typography>
-        <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold' }}>
+        <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold', marginY: 3 }}>
           Configuración de Simulación
         </Typography>
       </Box>
@@ -30,7 +30,7 @@ function App() {
           backgroundColor: 'rgba(0, 61, 38, 1)',
           borderRadius: 3,
         }}>
-        <Grid container rowSpacing={isCompact ? 2 : 3} columnSpacing={4} sx={{ justifyContent: 'center' }}>
+        <Grid container rowSpacing={isCompact ? 1.8 : 3} columnSpacing={4} sx={{ justifyContent: 'center' }}>
 
           <ClassConfigSection
             config={config.class1}
