@@ -1,37 +1,63 @@
-import './App.css';
-import { Box, Button, Container, Grid, Tooltip, Typography, useMediaQuery } from '@mui/material';
-import { useMatrixForm } from './hooks/useMatrixForm';
-import { GlobalSettingsSection } from './components/GlobalSettingsSection';
-import { ClassConfigSection } from './components/ClassConfigSection';
-import { generateMatrixFile } from './utils/export';
+import "./App.css";
+import {
+  Box,
+  Button,
+  Container,
+  Grid,
+  Tooltip,
+  Typography,
+  useMediaQuery,
+} from "@mui/material";
+import { useMatrixForm } from "./hooks/useMatrixForm";
+import { GlobalSettingsSection } from "./components/GlobalSettingsSection";
+import { ClassConfigSection } from "./components/ClassConfigSection";
+import { generateMatrixFile, saveMatrixFile } from "./utils/export";
 
 function App() {
-  const { config, updateConfig, updateClass1, updateClass2, validations } = useMatrixForm();
-  const isCompact = useMediaQuery('(max-width:1400px)');
+  const { config, updateConfig, updateClass1, updateClass2, validations } =
+    useMatrixForm();
+  const isCompact = useMediaQuery("(max-width:1400px)");
 
   return (
     <Container maxWidth={"md"} disableGutters>
-      <Box sx={{ width: '100%', textAlign: 'center', color: 'rgba(0, 27, 57, 1)', marginY: 2 }}>
-        <Typography variant="h2" sx={{ fontWeight: 'bold', marginBottom: 2 }}>
+      <Box
+        sx={{
+          width: "100%",
+          textAlign: "center",
+          color: "rgba(0, 27, 57, 1)",
+          marginY: 2,
+        }}
+      >
+        <Typography variant="h2" sx={{ fontWeight: "bold", marginBottom: 2 }}>
           TACTIC INVASORS
         </Typography>
-        <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold', marginY: 3 }}>
+        <Typography
+          variant="h4"
+          gutterBottom
+          sx={{ fontWeight: "bold", marginY: 3 }}
+        >
           Configuración de Simulación
         </Typography>
       </Box>
-      <Container maxWidth={"md"}
+      <Container
+        maxWidth={"md"}
         sx={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
           paddingTop: 4,
           paddingBottom: 3,
           paddingX: 2,
-          backgroundColor: 'rgba(0, 61, 38, 1)',
+          backgroundColor: "rgba(0, 61, 38, 1)",
           borderRadius: 3,
-        }}>
-        <Grid container rowSpacing={isCompact ? 1.8 : 3} columnSpacing={4} sx={{ justifyContent: 'center' }}>
-
+        }}
+      >
+        <Grid
+          container
+          rowSpacing={isCompact ? 1.8 : 3}
+          columnSpacing={4}
+          sx={{ justifyContent: "center" }}
+        >
           <ClassConfigSection
             config={config.class1}
             otherClassName={config.class2.name}
@@ -60,15 +86,32 @@ function App() {
             validations={validations}
           />
 
-          <Grid size={12} sx={{ justifyContent: 'center', display: 'flex' }}>
-            <Tooltip title="Genera la matriz de configuración (guardar en la carpeta 'Saved' del juego)" placement="top">
+          <Grid size={12} sx={{ justifyContent: "center", display: "flex" }}>
+            <Tooltip
+              title="Descargar la configuracion de los parametros de la simulacion"
+              placement="top"
+            >
               <Button
                 variant="contained"
                 size={isCompact ? "small" : "medium"}
                 onClick={() => generateMatrixFile(config)}
                 disabled={!validations.isFormValid}
+                style={{ marginRight: "1rem" }}
               >
-                Generar Matriz
+                Descargar Matriz
+              </Button>
+            </Tooltip>
+            <Tooltip
+              title="Guarda la configuracion de los parametros de la simulacion"
+              placement="top"
+            >
+              <Button
+                variant="contained"
+                size={isCompact ? "small" : "medium"}
+                onClick={() => saveMatrixFile(config)}
+                disabled={!validations.isFormValid}
+              >
+                Guardar
               </Button>
             </Tooltip>
           </Grid>

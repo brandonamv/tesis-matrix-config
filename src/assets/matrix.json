@@ -1,0 +1,28 @@
+{
+  "class1": {
+    "name": "Agresivo",
+    "initialPlayers": 1,
+    "formulas": [
+      "0.5*(v-c)",
+      "v"
+    ]
+  },
+  "class2": {
+    "name": "Pasivo",
+    "initialPlayers": 10,
+    "formulas": [
+      "0",
+      "v/2"
+    ]
+  },
+  "resourceGain": 2,
+  "resourceCost": 2,
+  "initialResources": 1,
+  "timePenalty": 0.2,
+  "initialFitness": 0.5,
+  "maxFitness": 2,
+  "simulationSpeed": 1.5,
+  "maxInteractions": 100,
+  "resourceIncrementType": 0,
+  "resourceIncrementFormula": "1/p"
+}
