@@ -69,7 +69,9 @@ export const saveMatrixFile = async (config: MatrixConfig) => {
       },
       body: jsonString,
     });
+    window.alert("Matriz guardada exitosamente");
   } catch (err) {
+    window.alert("Error al guardar la matriz");
     console.warn("Could not save to local dev server file", err);
   }
 };
