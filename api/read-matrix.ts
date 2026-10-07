@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { kv } from "./_kv"; // o donde tengas createClient
+import { kv } from "./_kv.js"; // o donde tengas createClient
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -19,11 +19,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(200).json(data);
   } catch (error) {
     console.error("Error en read-matrix:", error);
-    return res
-      .status(500)
-      .json({
-        error: "Error al consultar la base de datos",
-        details: String(error),
-      });
+    return res.status(500).json({
+      error: "Error al consultar la base de datos",
+      details: String(error),
+    });
   }
 }

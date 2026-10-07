@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { kv } from "./_kv"; // o donde tengas createClient
+import { kv } from "./_kv.js"; // o donde tengas createClient
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader("Access-Control-Allow-Origin", "*");
