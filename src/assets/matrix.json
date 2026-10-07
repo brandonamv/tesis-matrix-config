@@ -15,7 +15,7 @@
       "v/2"
     ]
   },
-  "resourceGain": 2,
+  "resourceGain": 1,
   "resourceCost": 2,
   "initialResources": 1,
   "timePenalty": 0.2,
